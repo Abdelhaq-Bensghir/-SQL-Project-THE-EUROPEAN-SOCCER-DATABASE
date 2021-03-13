@@ -1,0 +1,89 @@
+/*This is a first query using two tables to select matches Barcelona played as the home team,
+  their dates, the opponent and if it was a win or a loss for Barcelona*/
+
+SELECT 
+	m.date,	t.team_long_name AS opponent, 
+	CASE WHEN m.home_goal > m.away_goal THEN 'Barcelona win!'
+        WHEN m.home_goal < m.away_goal THEN 'Barcelona loss :('
+        ELSE 'Tie' END AS outcome
+FROM matches_spain AS m
+LEFT JOIN teams_spain AS t
+ON m.awayteam_id = t.team_api_id
+-- Filter for Barcelona as the home team
+WHERE m.hometeam_id = 8634;
+
+
+/*This is a first query using two tables to select matches Barcelona played as the away team,
+  their dates, the opponent and if it was a win or a loss for Barcelona*/
+  
+SELECT  
+	m.date, t.team_long_name AS opponent,
+	CASE WHEN home_goal < away_goal THEN 'Barcelona win!'
+        WHEN home_goal > away_goal THEN 'Barcelona loss :(' 
+        ELSE 'Tie' END AS outcome
+FROM matches_spain AS m
+LEFT JOIN teams_spain AS t 
+ON m.hometeam_id = t.team_api_id
+WHERE m.awayteam_id = 8634;
+
+/*  >> After the execution of the second query and comparing it to the first one, I can conclude that : 
+  Barcelona's performance seems to be worse when they are the away team. We'll explore this further */
+  
+/*Barcelona (id = 8634) and Real Madrid (id = 8633) have been rival teams for more than 80 years.
+Matches between these two teams are given the name El Clásico (The Classic).
+We will now query a list of matches played between these two rivals. */
+
+SELECT 
+	date,
+	-- Identify the home team as Barcelona or Real Madrid
+	CASE WHEN hometeam_id = 8634 THEN 'FC Barcelona' 
+        ELSE 'Real Madrid CF' END AS home,
+    -- Identify the away team as Barcelona or Real Madrid
+        CASE WHEN awayteam_id = 8634 THEN 'FC Barcelona' 
+        ELSE 'Real Madrid CF' END AS away
+FROM matches_spain
+WHERE (awayteam_id = 8634 OR hometeam_id = 8634)
+      AND (awayteam_id = 8633 OR hometeam_id = 8633);
+      
+
+/*We will code a request in order to find out
+the winner tem in each match of the classico */
+
+
+SELECT 
+	date,
+	CASE WHEN hometeam_id = 8634 THEN 'FC Barcelona' 
+         ELSE 'Real Madrid CF' END as home,
+	CASE WHEN awayteam_id = 8634 THEN 'FC Barcelona' 
+         ELSE 'Real Madrid CF' END as away,
+	-- Identify all possible match outcomes
+	CASE WHEN home_goal > away_goal AND hometeam_id = 8634 THEN 'Barcelona win!'
+        WHEN home_goal > away_goal AND hometeam_id = 8633 THEN 'Real Madrid win!'
+        WHEN home_goal < away_goal AND awayteam_id = 8634 THEN 'Barcelona win!'
+        WHEN home_goal < away_goal AND awayteam_id = 8633 THEN 'Real Madrid win!'
+        ELSE 'Tie!' END AS outcome
+FROM matches_spain
+WHERE (awayteam_id = 8634 OR hometeam_id = 8634)
+      AND (awayteam_id = 8633 OR hometeam_id = 8633);
+
+/* After restricting matches to matches_italy,
+   let's generate a list of matches won by Italy's Bologna team!*/
+
+
+-- Select the season, date, home_goal, and away_goal columns
+SELECT 
+	season,
+    date,
+	home_goal,
+	away_goal
+FROM matches_italy
+WHERE 
+-- Exclude games not won by Bologna
+	CASE WHEN hometeam_id = 9857 AND home_goal > away_goal THEN 'Bologna  Win'
+		WHEN awayteam_id = 9857 AND away_goal > home_goal THEN 'Bologna Win' 
+	END IS NOT NULL;
+
+
+
+
+
