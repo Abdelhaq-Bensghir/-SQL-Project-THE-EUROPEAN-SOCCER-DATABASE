@@ -13,6 +13,7 @@ WITH home AS (
   		   ELSE 'Tie' END AS outcome
   FROM match AS m
   LEFT JOIN team AS t ON m.hometeam_id = t.team_api_id),
+
 -- Set up the away team CTE
 away AS (
   SELECT m.id, t.team_long_name,
@@ -21,6 +22,7 @@ away AS (
   		   ELSE 'Tie' END AS outcome
   FROM match AS m
   LEFT JOIN team AS t ON m.awayteam_id = t.team_api_id)
+
 -- Select columns and and rank the matches by date
 SELECT DISTINCT
     m.date,
@@ -28,6 +30,7 @@ SELECT DISTINCT
     away.team_long_name AS away_team,
     m.home_goal, m.away_goal,
     RANK() OVER(ORDER BY ABS(home_goal - away_goal) DESC) as match_rank
+
 -- Join the CTEs onto the match table
 FROM match AS m
 LEFT JOIN home ON m.id = home.id
