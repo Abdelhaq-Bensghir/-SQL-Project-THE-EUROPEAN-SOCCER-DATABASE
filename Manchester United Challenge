@@ -68,7 +68,7 @@ SELECT DISTINCT
     home.team_long_name AS home_team,
     away.team_long_name AS away_team,
     m.home_goal, m.away_goal,
-    RANK() OVER(ORDER BY ABS(home_goal - away_goal) DESC) as match_rank     -- Determine how well they winned with a window function
+    RANK() OVER(ORDER BY ABS(home_goal - away_goal) DESC) as match_rank     -- Determine how well they won with a window function
     
 -- Join the CTEs onto the match table
 FROM match AS m
